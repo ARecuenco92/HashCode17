@@ -11,39 +11,39 @@ import com.model.SystemCache;
 
 public class Main {
 
-	private static void store(List<Cache> caches, String file){
+	private static void store(List<Cache> caches, String file) {
 		List<String> lines = new ArrayList<String>();
 		lines.add(Integer.toString(caches.size()));
-		
-		for(Cache cache : caches){
+
+		for (Cache cache : caches) {
 			lines.add(cache.toString());
 		}
-		
+
 		try {
 			Files.createDirectories(Paths.get("out"));
-			Files.write(Paths.get("out/"+file+".out"), lines);
+			Files.write(Paths.get("out/" + file + ".out"), lines);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
-	
-	public static void main(String[] args){
+
+	public static void main(String[] args) {
 		List<String> files = new ArrayList<String>();
-		files.add("kittens");
 		files.add("me_at_the_zoo");
 		files.add("trending_today");
 		files.add("videos_worth_spreading");
+		files.add("kittens");
 		
 		SystemCache system;
 		long score, total = 0;
-		for(String file : files){
-			system = new SystemCache("files/"+file+".in");
-			
+		for (String file : files) {
+			system = new SystemCache("files/" + file + ".in");
+
 			store(system.run(), file);
 			score = system.getScore();
-			System.out.println("Score "+file+": "+score);
+			System.out.println("Score " + file + ": " + score);
 			total += score;
 		}
-		System.out.println("\nTotal score: "+total);
+		System.out.println("\nTotal score: " + total);
 	}
 }

@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 
 public class SystemCache {
@@ -103,13 +105,44 @@ public class SystemCache {
 		}
 	}
 
-	public List<Cache> run() {
+	private HashMap<String, Saving> calculateSavings(){
+		HashMap<String, Saving> list = new HashMap<String, Saving>();
+		
+		int latency;
+		List<Cache> caches;
+		Video video;
+		Saving saving;
+		long total;
 		for (Endpoint e : endpoints) {
-			for (Cache c : e.getCaches()) {
-				for (Request r : e.getRequests()) {
-					c.addVideo(r.getVideo());
+			caches = e.getCaches();
+			for (Request r : e.getRequests()) {
+				video = r.getVideo();
+				latency = e.getLatency();
+				for (int c = 0; c < caches.size(); c++) {
+					saving = new Saving(caches.get(c), video);
+					total = latency - e.getLatencies().get(c);
+					if (list.containsKey(saving.getKey())) {
+						saving = list.get(saving.getKey());
+						saving.setSaving(saving.getSaving() + total);
+					} 
+					else{
+						saving.setSaving(total);
+					}
+					list.put(saving.getKey(), saving);
 				}
 			}
+		}
+		
+		return list;
+	}
+	
+	public List<Cache> run() {
+		HashMap<String, Saving> savings = calculateSavings();
+		ArrayList<Saving> list = new ArrayList<Saving>(savings.values());
+		Collections.sort(list);
+
+		for (Saving s : list) {
+			s.getCache().addVideo(s.getVideo());
 		}
 		return caches;
 	}
