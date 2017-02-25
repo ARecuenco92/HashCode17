@@ -27,6 +27,7 @@ public class Cache {
 
 	public void setCapacity(int capacity) {
 		this.capacity = capacity;
+		this.remain = capacity;
 	}
 
 	public List<Video> getVideos() {

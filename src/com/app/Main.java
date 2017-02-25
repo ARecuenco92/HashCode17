@@ -35,10 +35,15 @@ public class Main {
 		files.add("videos_worth_spreading");
 		
 		SystemCache system;
+		long score, total = 0;
 		for(String file : files){
 			system = new SystemCache("files/"+file+".in");
 			
 			store(system.run(), file);
+			score = system.getScore();
+			System.out.println("Score "+file+": "+score);
+			total += score;
 		}
+		System.out.println("\nTotal score: "+total);
 	}
 }

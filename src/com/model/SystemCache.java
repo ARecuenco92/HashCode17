@@ -83,8 +83,8 @@ public class SystemCache {
 			e.printStackTrace();
 		}
 	}
-	
-	private void initCaches(int caches, int capacity){
+
+	private void initCaches(int caches, int capacity) {
 		Cache cache;
 		for (int i = 0; i < caches; i++) {
 			cache = new Cache(i);
@@ -93,7 +93,7 @@ public class SystemCache {
 		}
 	}
 
-	private void initVideos(int videos, String line){
+	private void initVideos(int videos, String line) {
 		String[] videoSizes = line.split(" ");
 		Video video;
 		for (int i = 0; i < videos; i++) {
@@ -103,8 +103,37 @@ public class SystemCache {
 		}
 	}
 
-
 	public List<Cache> run() {
+		for (Endpoint e : endpoints) {
+			for (Cache c : e.getCaches()) {
+				for (Request r : e.getRequests()) {
+					c.addVideo(r.getVideo());
+				}
+			}
+		}
 		return caches;
+	}
+
+	public long getScore() {
+		long total = 0, latency, requests = 0;
+		List<Cache> caches;
+		Video video;
+		Cache cache;
+		for (Endpoint e : endpoints) {
+			caches = e.getCaches();
+			for (Request r : e.getRequests()) {
+				video = r.getVideo();
+				latency = e.getLatency();
+				for (int c = 0; c < caches.size(); c++) {
+					cache = caches.get(c);
+					if (cache.hasVideo(video) > -1) {
+						latency = Math.min(latency, e.getLatencies().get(c));
+					}
+				}
+				total += r.getRequests() * (e.getLatency() - latency);
+				requests += r.getRequests();
+			}
+		}
+		return total * 1000 / requests;
 	}
 }
